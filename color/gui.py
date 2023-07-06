@@ -8,26 +8,34 @@ import PyQt5
 import cv2
 import numpy as np
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QFileDialog
-from color import temp
-
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QFileDialog, QMainWindow
+import temp
+import main
 
 
 def colorize(ir_image_path):
-    pass
-
+    temp.run(cv2.imread(ir_image_path))
 
 def sr(ir_image_path):
-    pass
-
+    main.run(ir_image_path)
 
 class GUI:
     def __init__(self):
         self.app = QApplication([])
+        # 创建一个主窗口
+        # self.main_window = QMainWindow()
+
         self.window = QWidget()
         self.window.setWindowTitle('图像增强')
         self.window.setGeometry(100, 100, 1300, 600)
         self.ir_image_path = ''
+
+        # 添加一个菜单栏
+        # self.main_window.setCentralWidget(self.window)
+        # self.main_window.show()
+
+
+
 
         # add a label to show origin image
         self.label_ir_image = QLabel(self.window)
@@ -47,7 +55,7 @@ class GUI:
         self.button_sr.clicked.connect(
             lambda: self.show_img(
                 QFileDialog.getOpenFileName(self.window, '选择待增强图像', './', 'Image Files(*.jpg *.png)')[0],
-                self.label_ir_image, self.label_ir_image))
+                self.label_ir_image))
 
         # add a button to choose origin image
         self.button_choose_origin = QPushButton('超分', self.window)
@@ -62,15 +70,15 @@ class GUI:
 
         # add a label
         self.label_origin = QLabel(self.window)
-        self.set_text_label(self.label_origin, '可见光图像', 200, 0, 150, 100)
+        self.set_text_label(self.label_origin, '待增强图像', 200, 0, 250, 100)
 
         # add a label
         self.label_ir = QLabel(self.window)
-        self.set_text_label(self.label_ir, '红外图像', 600, 0, 150, 100)
+        self.set_text_label(self.label_ir, '超分结果', 600, 0, 200, 100)
 
         # add a label
         self.label_result = QLabel(self.window)
-        self.set_text_label(self.label_result, '融合图像', 1000, 0, 150, 100)
+        self.set_text_label(self.label_result, '着色结果', 1000, 0, 200, 100)
 
         # show the window
         self.window.show()
@@ -78,6 +86,8 @@ class GUI:
         self.app.exec_()
 
     def show_img(self, img_path, label, size=(320, 256)):
+        # 将imgg_path中的'/'替换为'\\'
+        img_path = img_path.replace('/', '\\')
         img = QPixmap(img_path)
         img = img.scaled(size[0], size[1])
         label.setPixmap(img)
@@ -117,4 +127,5 @@ class GUI:
 if __name__ == '__main__':
     GUI()
     # 删除临时的‘result.png’文件
-    os.remove('result.png')
+    if os.path.exists('result.jpg'):
+        os.remove('result.jpg')
